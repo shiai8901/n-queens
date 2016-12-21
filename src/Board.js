@@ -79,12 +79,23 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
-      return false; // fixme
+      var row = this.rows()[rowIndex];
+      var filtered = row.filter(function(item) {
+        return item > 0;
+      }).length;
+      return filtered > 1; // fixme
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
-      return false; // fixme
+      var conflicts = false;
+      for (var i = 0; i < this.rows().length; i++) {
+        conflicts = this.hasRowConflictAt(i);
+        if (conflicts) {
+          return true;
+        }
+      }
+      return conflicts; // fixme
     },
 
 
@@ -94,6 +105,7 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
+      
       return false; // fixme
     },
 
