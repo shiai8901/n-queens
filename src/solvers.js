@@ -16,35 +16,37 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution;
+  var solution = [];
 
   
   //make a move (put piece on 1st square) - 64 possible
   //loop through possible choices
-  for (var i = 0; i < n; i++) {
-    for (var j = 0; j < n; j++) {
-      //set first piece     
-      board.rows()[i][j] = 1;
-      for (var k = 0; k < n; k++) {
-        for (var m = 0; m < n; m++) {
-          //makign sure second piece doesn't share row or column with 1st piece
-          if (!(k !== i || m !== j)) {
-            //set second piece;
-            board.rows()[k][m] = 1;  
-          }
-        }   
-      }
-      //make next move recursively
-    }
-  }
+  // for (var i = 0; i < n; i++) {
+  //   for (var j = 0; j < n; j++) {
+  //     //set first piece     
+  //     board.rows()[i][j] = 1;
+  //     for (var k = 0; k < n; k++) {
+  //       for (var m = 0; m < n; m++) {
+  //         //makign sure second piece doesn't share row or column with 1st piece
+  //         if (!(k !== i || m !== j)) {
+  //           //set second piece;
+  //           board.rows()[k][m] = 1;  
+  //         }
+  //       }   
+  //     }
+  //     //make next move recursively
+  //   }
+  // }
 
-  var rows = [];
-  var cols = [];
+  // var rows = [];
+  // var cols = [];
 
   var board = new Board({n: n});
 
+  // we need to pass the matrix in to board instantation
+ 
   var Node = function(board) {
-    this.value = board;
+    this.board = board;
     this.children = [];
   };
   
@@ -52,17 +54,20 @@ window.findNRooksSolution = function(n) {
     //basecase n = num of pieces of board
     
     //create root
-  var root = new Node(board);
+  var emptyBoard = new Node(board);
+  //console.log(emptyBoard);
  
   var helper = function(node) {
     //populate children nodes
+    var matrix = JSON.parse(JSON.stringify(node.board.attributes));
     for (var i = 0; i < n; i++) {
       for (var j = 0; j < n; j++) {
-        var tmp = Object.assign(node.value);
-        tmp[i][j] = 1; 
-        var newNode = new Node(tmp);
-        if ( (JSON.stringify(tmp) !== JSON.stringify(node.value)) && (!tmp.hasAnyRowConflicts && !tmp.hasAnyColConflicts) ) {
-          node.children.push(newNode);
+        var tempBoard = new Board(matrix);
+        var tmp = new Node(tempBoard);
+        tmp.board.togglePiece(i, j); 
+        //console.log(node.board.attributes);
+        if ( (JSON.stringify(tmp.board.attributes) !== JSON.stringify(node.board.attributes)) && !tmp.board.hasAnyRowConflicts() && !tmp.board.hasAnyColConflicts() ) {
+          node.children.push(tmp);
         }
       }
     }
@@ -70,6 +75,7 @@ window.findNRooksSolution = function(n) {
     for (var i = 0; i < node.children.length; i++) {
       helper(node.children[i]);
     }
+
 
       //go through each child node and eliminate conflicts
       // for (var i = 0; i < node.children.length; i++) {
@@ -81,7 +87,7 @@ window.findNRooksSolution = function(n) {
       //add to rows and cols
   };
 
-  helper(root);
+  helper(emptyBoard);
 
   // set second piece by recusions with updated row and cols arrays
 
@@ -99,12 +105,16 @@ window.findNRooksSolution = function(n) {
 
   // return any leaf
   // iterate over tree and find a leaf
+
+
+  var result;
   
   var iterateOverTree = function(node) {
     //check if node has children
     if (node.children.length === 0) {
     //if not return node
-      return node.value; 
+      result = node.board;
+      return; 
     } else {
      //if so recursively call over root.children
       for (var i = 0; i < node.children.length; i++) {
@@ -112,13 +122,24 @@ window.findNRooksSolution = function(n) {
       }
     }
   };
-
-  solution = iterateOverTree(root);
   
+ // debugger;
+  iterateOverTree(emptyBoard);
+ 
+  // for (var key in result.attributes) {
+  //   if (!(key === 'n')) {
+  //     solution.push(result.attributes[key]);
+  //   }
+  // }
+
+  //console.log(emptyBoard);  
+ // solution.push(iterateOverTree(emptyBoard).attributes);
+  
+ // console.log(solution);
 
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution;
+  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(result.rows()));
+  return result.rows();
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
