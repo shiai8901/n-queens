@@ -16,7 +16,106 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution;
+
+  
+  //make a move (put piece on 1st square) - 64 possible
+  //loop through possible choices
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      //set first piece     
+      board.rows()[i][j] = 1;
+      for (var k = 0; k < n; k++) {
+        for (var m = 0; m < n; m++) {
+          //makign sure second piece doesn't share row or column with 1st piece
+          if (!(k !== i || m !== j)) {
+            //set second piece;
+            board.rows()[k][m] = 1;  
+          }
+        }   
+      }
+      //make next move recursively
+    }
+  }
+
+  var rows = [];
+  var cols = [];
+
+  var board = new Board({n: n});
+
+  var Node = function(board) {
+    this.value = board;
+    this.children = [];
+  };
+  
+
+    //basecase n = num of pieces of board
+    
+    //create root
+  var root = new Node(board);
+ 
+  var helper = function(node) {
+    //populate children nodes
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
+        var tmp = Object.assign(node.value);
+        tmp[i][j] = 1; 
+        var newNode = new Node(tmp);
+        if ( (JSON.stringify(tmp) !== JSON.stringify(node.value)) && (!tmp.hasAnyRowConflicts && !tmp.hasAnyColConflicts) ) {
+          node.children.push(newNode);
+        }
+      }
+    }
+
+    for (var i = 0; i < node.children.length; i++) {
+      helper(node.children[i]);
+    }
+
+      //go through each child node and eliminate conflicts
+      // for (var i = 0; i < node.children.length; i++) {
+      //   if (!node.children[i].hasAnyRowConflicts && !node.children[i].hasAnyColConflicts) {
+      //     helper(node.children[i]);
+      //   }  
+      // }
+
+      //add to rows and cols
+  };
+
+  helper(root);
+
+  // set second piece by recusions with updated row and cols arrays
+
+
+  //helper function
+
+  //remove conflicts - keep going on non-conflict moves
+    //remove conflicts via tagging with null
+    // find conflict in rows/colums/minor and major diagonal
+    // for each movve we have to check with thse functions
+  //generate all possible next steps
+  //recurse/repeat
+
+  //returns matrix
+
+  // return any leaf
+  // iterate over tree and find a leaf
+  
+  var iterateOverTree = function(node) {
+    //check if node has children
+    if (node.children.length === 0) {
+    //if not return node
+      return node.value; 
+    } else {
+     //if so recursively call over root.children
+      for (var i = 0; i < node.children.length; i++) {
+        iterateOverTree(node.children[i]);
+      }
+    }
+  };
+
+  solution = iterateOverTree(root);
+  
+
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
